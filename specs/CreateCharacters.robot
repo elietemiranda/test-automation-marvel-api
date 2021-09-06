@@ -1,34 +1,29 @@
 *Settings*
-Documentation       Suite de Teste do cadastro de personagens na API da Marvel
+Documentation    Suite de Teste do cadastro de personagens na API da Marvel
 
 Resource    ${EXECDIR}/resources/Base.robot
-Library     ${EXECDIR}/resources/factories/Thanos.py
+Library     ${EXECDIR}/resources/factories/Guardians.py
+
+Suite Setup     Super Setup     eliete@gmail.com
 
 *Test Cases*
 Deve cadastrar um personagem
 #& usado para dicionário #$variável simples
 
-    Set Client Key        eliete@gmail.com
+    ${personagem}       Factory Star Lord
+    ${response}         POST New Character    ${personagem}
 
-    &{personagem}       Factory Thanos
-
-    ${response}     POST        
-    ...             ${API_URL}/characters
-    ...             json=${personagem}
-    ...             headers=${headers}
-
-    Status Should Be        200     ${response}
+    Status Should Be    200    ${response}
 
 Não deve cadastrar com o mesmo nome
+    [Tags]      dup
 
-    #Dado que Thanos já existe no sistema
-    ${personagem}       Factory Thanos
+    ${personagem}         Factory Groot
+    POST New Character    ${personagem}     
 
-    POST        ${API_URL}/characters
-    ...         json=${personagem}
-    ...         headers=${HEADERS}
+    ${response}    POST New Character    ${personagem}
 
-    Quando faço uma requisição POST para a rota characters
-    Então o código de retorno dever ser 409
+    Status Should Be    409                          ${response}
+    Should Be Equal     ${response.json()}[error]    Character already exists :(
 
- 
+
